@@ -31,5 +31,7 @@
     <!--子模块-->
     <modules>
         <module>eureka-service</module>
+        <module>microcloud-provider</module>
+        <module>microcloud-consumer</module>
     </modules>
 </project>
