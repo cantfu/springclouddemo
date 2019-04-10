@@ -1,15 +1,17 @@
-## Spring Cloud 组件学习 
+## Spring Cloud 组件学习 知识小总结
 
 微服务设计原则：
 
 1. 单一职责
+
 2. 轻量级通信 （通常基于 RESTful API，还有 AMQP etc.）
+
 3. 独立性
+
 4. 进程隔离
 
-### Spring Cloud 全家桶
 
-#### （1）**Spring Cloud Eureka**
+### （1）**Spring Cloud Eureka**
 
 >  服务治理：服务注册与服务发现。维护 `服务注册中心`、`生产者`、`消费者` 的关系
 
@@ -43,7 +45,7 @@ Eureka 的实际生产环境应该是一个集群而不是单机，多个 Eureka
 
 
 
-#### **（2）Spring Cloud Ribbon**
+### **（2）Spring Cloud Ribbon**
 
 > 负载均衡（Load Balancing， LB）；具体消费者对数据的调用，实现服务的 **`客户端负载均衡`**调用
 >
@@ -71,25 +73,29 @@ Ribbon 通常和 Eureka 进行无缝整合（当然也可以不用），Ribbon �
 
 消费者客户端在访问请求列表时，默认从配置为文件中的 **ribbonServerList**获取，但和 Eureka 整合后，会被 **DiscoveryEnabledNIWSServerList** 所重写，就可以实现自动从注册中心获取列表（也就是用上了服务发现功能，不用自己写死 ribbonServerList 了）。
 
-[查看 Ribbon 和 Eureka 整合 demo](<https://github.com/cantfu/springclouddemo/blob/master/md/SpringCloud%E7%BB%84%E4%BB%B6%E4%B9%8BRibbon.md)
+[查看 Ribbon 和 Eureka 整合 demo](https://github.com/cantfu/springclouddemo/blob/master/md/SpringCloud%E7%BB%84%E4%BB%B6%E4%B9%8BRibbon.md)
 
-#### **（3）Spring Cloud Feign**
+
+
+
+
+### **（3）Spring Cloud Feign**
 
 使得（1）（2）的使用更加简单，可以简化我们的编码
 
-#### **（4）Spring Cloud Hystrix**
+### **（4）Spring Cloud Hystrix**
 
 `断路器` :防止对某一故障服务持续进行访问。
 
-#### **（5）Spring Cloud Config**
+### **（5）Spring Cloud Config**
 
 分布式配置中心组件Spring Cloud Config.
 
-#### **（6）Spring Cloud Zuul**
+### **（6）Spring Cloud Zuul**
 
 服务网关：
 
-#### **（7）Spring Cloud Bus**
+### **（7）Spring Cloud Bus**
 
 消息总线：动态更新服务配置 Config 等。
 
