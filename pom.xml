@@ -33,5 +33,7 @@
         <module>eureka-service</module>
         <module>microcloud-provider</module>
         <module>microcloud-consumer</module>
+        <module>microcloud-consumer-ribbon</module>
+        <module>microcloud-consumer-feign</module>
     </modules>
 </project>

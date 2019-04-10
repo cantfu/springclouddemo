@@ -77,11 +77,43 @@ Ribbon 通常和 Eureka 进行无缝整合（当然也可以不用），Ribbon �
 
 
 
-
-
 ### **（3）Spring Cloud Feign**
 
-使得（1）（2）的使用更加简单，可以简化我们的编码
+>  声明式服务调用。使得 (2) 的使用更加简单，可以简化我们的编码。以前是 Ribbon 和 RetTemplate 配合，现在是 Feign。
+>
+> <https://cloud.spring.io/spring-cloud-openfeign/spring-cloud-openfeign.html>
+
+Spring Cloud 使得 Feign 支持了 Spring MVC 注解，并整合了 Ribbon 和 Eureka。
+
+**使用**起来非常简单，
+
+1. 在启动类添加 @EnableFeignClients，开启 Feign 功能
+2. 自定义一个接口，添上注解 @FeignClient(name="xxx")，这个接口则是对应着 xxx 这个服务，接口的每个方法对应着这个 xxx 服务的每个接口。由于支持Spring MVC 注解，则这些方法使用@RequestMapping 注解即可，Feign 会自动生成这个接口的代理实现类，在需要调用服务处（如Controller）注入即可。
+
+这样，就可以直接调用方法去调用服务，而不是用 restTemplate 写字符串拼接 url 和参数去调用服务，后者在参数多的时候其效率可想而知。
+
+Spring Cloud Netflix默认为feign（`BeanType`beanName :) 提供以下bean `ClassName`：
+
++ `Decoder`feignDecoder :( `ResponseEntityDecoder`包装一个`SpringDecoder`）
++ `Encoder` feignEncoder： `SpringEncoder`
++ `Logger` feignLogger： `Slf4jLogger`
++ `Contract` feignContract： `SpringMvcContract`
++ `Feign.Builder` feignBuilder： `HystrixFeign.Builder`
++ `Client`feignClient：如果启用了功能区，则为a `LoadBalancerFeignClient`，否则使用默认的假设客户端。
+
+**自定义配置**
+
+
+
+[查看 Feign demo](https://github.com/cantfu/springclouddemo/blob/master/md/SpringCloud%E7%BB%84%E4%BB%B6%E4%B9%8BFeign.md)
+
+
+
+// TODO 自定义配置、手动创建 Feign
+
+
+
+
 
 ### **（4）Spring Cloud Hystrix**
 
