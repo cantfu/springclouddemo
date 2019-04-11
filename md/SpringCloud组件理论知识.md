@@ -19,7 +19,8 @@
 
 Eurake 包含两个组件 Eureka Server、Eureka Client
 
-Eureka Server 维护一个注册中心，并每 30s 向各个服务发送一个心跳用于更新 “租赁”，若 Client 不能续约，则 Eureka Server 在 90s 内将会移除此服务。多个Server下，更新的信息会复制到 Eureka Server 集群节点中。
+Eureka Server 维护一个注册中心，并每 30s 向各个服务发送一个心跳用于更新 “租赁”，若 Client 不能续约，则 Eureka Server 在 90s 内将会移除此服务。多个Server下，Eureka
+ Server 还会在 5min 的间隔从对等的节点（由eureka.client.service-url.defaultZone 配置）中复制所有服务注册信息以达到同步的目的。
 
 Eureka Client 在启动时会将自己的网络地址等信息注册（`Register`）到 Server， 也可以从 Server 获取所有的服务列表（也就是客户端缓存，降低 Server 的压力）。每 30s Client 会更新注册(`Renew`)信息。当然， Client 也可以不注册到 Server ，如纯粹的服务消费者，不需要注册自己，只需要获得服务列表；也可以不获取服务列表，如纯粹的服务提供者，只需要注册自己，不需要获取服务列表。
 
@@ -36,6 +37,8 @@ Eureka 提供了许多接口，可用于 注册服务、取消注册、发送心
 Eureka 有自我保护的功能，当 15min 内地若有低于 85% 的服务未续约，则 服务端进入自我保护，即不再删除服务，以保护服务注册信息。
 
 比如 网络中断，其实服务没有不续租，但 注册中心 会认为不可用而删除，自我保护就是防止此类情况发生。
+
+另外，服务端在 5min 同步 集群节点服务信息失败也会导致进入自我保护模式。
 
 **1.4 高可用**
 
@@ -103,13 +106,17 @@ Spring Cloud Netflix默认为feign（`BeanType`beanName :) 提供以下bean `Cla
 
 **自定义配置**
 
+先建一个配置类，使用@Configuration、@Bean 注解（注意此配置类不能在 Spring 的@ComponentScan 上下文中），在 ProviderService 服务接口上使用@FeignClient(name="", configuration="")即可实现自定义配置。
 
+**手动创建 Feign**
+
+// TODO 自定义配置、手动创建 Feign
 
 [查看 Feign demo](https://github.com/cantfu/springclouddemo/blob/master/md/SpringCloud%E7%BB%84%E4%BB%B6%E4%B9%8BFeign.md)
 
 
 
-// TODO 自定义配置、手动创建 Feign
+
 
 
 
