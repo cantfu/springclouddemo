@@ -116,15 +116,55 @@ Spring Cloud Netflix默认为feign（`BeanType`beanName :) 提供以下bean `Cla
 
 
 
-
-
-
-
-
-
 ### **（4）Spring Cloud Hystrix**
 
-`断路器` :防止对某一故障服务持续进行访问。
+> `断路器客户端` :防止对某一故障服务持续进行访问、或关闭次要服务为主要服务让路。
+>
+> <https://github.com/Netflix/Hystrix/>
+>
+> <https://cloud.spring.io/spring-cloud-static/spring-cloud-netflix/2.1.0.RELEASE/single/spring-cloud-netflix.html#_circuit_breaker_hystrix_clients>
+
+Hystrix已经停止开发,但仍然维护，官方推荐替代项目Resilience4j。
+
+Hystrix 在调用某个服务不成功时（如挂掉、网络超时，整个服务集群都不可用），若没有处理方式则服务调用一直不成功，这个影响将直接传递到用户。为了整服务的可用性，可以加入容错处理，可暂时返回备用的信息（如提示错误信息。总比一直调用不成功好）。
+
+服务降级：
+
+此容错处理发生在客户端（即消费者），在整个生产者集群都不可用时就会调用此容错处理（fallback）。
+
+![1555140378204](assets/1555140378204.png)
+
+可以用 Ribbon+RestTemplate+Hystrix，也可以用 Feign+Hystrix 的方式，spring cloud 的 Feign 集成了 Hystrix，更加方便。
+
+** 当网络延迟导致时间超过 Hystrix 超时时间会发生熔断，超过 Ribbon 的超时时间可以发生重试，若想要要先重试可以增大 Hystrix 的超时时间（必须比 Ribbon 的大），通过设置`hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds`即可。
+
+**压缩支持**
+
+Spring Cloud Feign 支持对请求和响应进行GZIP压缩，以减少通信过程中的性能损耗。通过下面的参数即可开启请求与响应的压缩功能：
+
+```yaml
+feign:
+  compression:
+    request:
+      enabled: true # 开启请求压缩
+    response:
+      enabled: true # 开启响应压缩
+```
+
+同时，我们也可以对请求的数据类型，以及触发压缩的大小下限进行设置：
+
+```yaml
+feign:
+  compression:
+    request:
+      enabled: true # 开启请求压缩
+      mime-types: text/html,application/xml,application/json # 设置压缩的数据类型
+      min-request-size: 2048 # 设置触发压缩的大小下限
+```
+
+注：上面的数据类型、压缩大小下限均为默认值。
+
+[查看服务断路器 Hystrix demo](https://github.com/cantfu/springclouddemo/blob/master/md/SpringCloud%E7%BB%84%E4%BB%B6%E4%B9%8BHystrix.md)
 
 ### **（5）Spring Cloud Config**
 

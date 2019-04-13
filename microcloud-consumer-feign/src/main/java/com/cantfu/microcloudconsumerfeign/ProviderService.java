@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * ProviderService
- * provider 服务的调用
+ * provider 服务的调用,加上了熔断处理
  * @author cantfu
  * @date 2019/4/10
  */
-@FeignClient(name="provider")
+@FeignClient(name="provider",fallback = ProviderServiceFallBackImpl.class)
 public interface ProviderService {
 // @FeignClient 的name指向对应的服务名,没有用服务发现功能（Eureka）的话需要指定 url
 
