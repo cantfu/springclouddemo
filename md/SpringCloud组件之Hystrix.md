@@ -1,4 +1,4 @@
-## Spring Cloud 组件之 Feign
+## Spring Cloud 组件之 Hystrix
 
 > JDK 8
 >

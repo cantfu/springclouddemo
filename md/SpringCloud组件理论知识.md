@@ -166,13 +166,117 @@ feign:
 
 [查看服务断路器 Hystrix demo](https://github.com/cantfu/springclouddemo/blob/master/md/SpringCloud%E7%BB%84%E4%BB%B6%E4%B9%8BHystrix.md)
 
-### **（5）Spring Cloud Config**
+
+
+### **（5）Spring Cloud Zuul**
+
+>  微服务网关:可以和Eureka,Ribbon,Hystrix等组件配合使用
+
+在 用上 Eureka+Feign 的时候，架构图如下所示：
+
+![1555146951682](assets/1555146951682.png)
+
+
+
+此时，所有微服务注册到 Eureka Server 中，所有 Eureka Client从 Eureka Server 拉取服务列表，当使用 Feign 调用服务时，首先通过 Ribbon 的负载均衡选择一个服务实例，获取其服务地址，再通过 http 实现rest 调用服务，使用 Hystrix 的融断机制来避免在微服务架构中个别服务出现异常时引起的故障蔓延。
+
+这样有如下缺点：
+
+1. 对外服务，直接暴露我们的服务地址
+2. 当需要权限认证等功能时，所有的服务都需要加上逻辑代码，对微服务的无状态造成了很高的污染
+3. 很多逻辑重复，无法服用
+
+**解决办法：服务网关！**
+
+> As an edge service application, Zuul is built to enable dynamic routing, monitoring, resiliency and security.
+
+Spring Cloud 对 Zuul 进行了封装，只需引入 zuul ，自带了 Ribbon 可实现负载均衡。一般可再引入 Eureka Client就可以获取所有服务列表，那么不用在每个路由写完整的 ip 地址，只需写 service-id 即可。
+
+![1555154276999](assets/1555154276999.png)
+
+
+
+**路由配置**
+
+通过配置`zuul.routes.<serviceId>=<path>` 可简化配置路由，比如：
+
+```yaml
+zuul:
+  routes:
+    # 简化配置
+    provider: /provider/** #映射路径
+    # 复杂配置如下
+    consumer:
+      path: /consumer/**
+      serviceId: consumer-feign #服务名称,可从服务列表获取
+```
+
+**默认路由配置**
+
+默认情况下，一切服务的映射路径就是服务名本身。例如服务名为：`provider`，则默认的映射路径就是：`/provider/**`，也就是说上面的配置是默认配置，可以不写。外部路由上的第一层就是默认为服务名。
+
+// TODO
+
+???配置了网关之后，外部访问是通过 zuul，那么内部服务之间呢？还会通过网关吗？
+
+??zuul 的客户端熔断怎么使用？？
+
+
+
+**过滤器**
+
+Zuul作为网关的其中一个重要功能，就是实现请求的鉴权。而这个动作我们往往是通过Zuul提供的过滤器来实现的。
+
+过滤器需要实现 ZuulFilter 抽象类，要实现的几个方法的类型为：
+
++ `shouldFilter`：返回一个`Boolean`值，判断该过滤器是否需要执行。返回true执行，返回false不执行。
++ `run`：过滤器的具体业务逻辑。
++ `filterType`：返回字符串，代表过滤器的类型。包含以下4种：
+  + `pre`：请求在被路由之前执行
+  + `routing`：在路由请求时调用
+  + `post`：在routing和errror过滤器之后调用
+  + `error`：处理请求时发生错误调用
++ `filterOrder`：通过返回的int值来定义过滤器的执行顺序，数字越小优先级越高。
+
+**过滤器使用场景：**
+
++ 请求鉴权：一般放在pre类型，如果发现没有访问权限，直接就拦截了
++ 异常处理：一般会在error类型和post类型过滤器中结合来处理。
++ 服务调用时长统计：pre和post结合使用。
+
+**负载均衡和熔断机制**
+
+Zuul中默认就已经集成了Ribbon负载均衡和Hystix熔断机制。但是所有的超时策略都是走的默认值，比如熔断超时时间只有1s，很容易就触发了。因此建议手动进行配置：
+
+```yaml
+zuul:
+  retryable: true
+ribbon:
+  ConnectTimeout: 250 # 连接超时时间(ms)
+  ReadTimeout: 2000 # 通信超时时间(ms)
+  OkToRetryOnAllOperations: true # 是否对所有操作重试
+  MaxAutoRetriesNextServer: 2 # 同一服务不同实例的重试次数
+  MaxAutoRetries: 1 # 同一实例的重试次数
+hystrix:
+  command:
+  	default:
+        execution:
+          isolation:
+            thread:
+              timeoutInMillisecond: 6000 # 熔断超时时长：6000ms
+```
+
+
+
+[查看服务网关 Zuul demo](https://github.com/cantfu/springclouddemo/blob/master/md/SpringCloud%E7%BB%84%E4%BB%B6%E4%B9%8BZuul.md)
+
+
+
+### （6）Spring Cloud Config**
 
 分布式配置中心组件Spring Cloud Config.
 
-### **（6）Spring Cloud Zuul**
 
-服务网关：
 
 ### **（7）Spring Cloud Bus**
 

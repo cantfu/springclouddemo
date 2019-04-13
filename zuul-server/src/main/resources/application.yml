@@ -1,0 +1,35 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: zuul-server #服务名
+
+#服务注册中心实例的主机名和地址
+eureka:
+  instance:
+    hostname: localhost
+
+  port: 8989
+  client:
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${eureka.port}/eureka/
+    registry-fetch-interval-seconds: 5 # 获取服务列表的周期
+
+zuul:
+  retryable: true
+  routes:
+    provider:
+      path: /provider/** #映射路径
+      serviceId: provider #服务名称,可从服务列表获取
+    consumer:
+      path: /consumer/**
+      serviceId: consumer-feign
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMillisecond: 6000 # 熔断超时时长：6000ms
